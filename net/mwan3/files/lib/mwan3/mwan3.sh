@@ -138,11 +138,11 @@ mwan3_create_iface_iptables()
 		fi
 
 		#### Dirty OpenVPN Tweak ####
-		network_get_physdev ___dummydev "$1"
 		if [ -z "$src_ip" ]; then
+			network_get_physdev ___dummydev "$1"
 			[ ! -z "$___dummydev" ] && src_ip=`ip addr show $___dummydev | grep inet | awk -F'inet |/' '{printf $2}'`
+			unset ___dummydev
 		fi
-		unset ___dummydev
 		#############################
 		
 		$IPS -! create mwan3_connected list:set
