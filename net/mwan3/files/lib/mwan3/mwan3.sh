@@ -137,6 +137,14 @@ mwan3_create_iface_iptables()
 			network_get_ipaddr src_ip $1
 		fi
 
+		#### Dirty OpenVPN Tweak ####
+		network_get_physdev ___dummydev "$1"
+		if [ -z "$src_ip" ]; then
+			[ ! -z "$___dummydev" ] && src_ip=`ip addr show $___dummydev | grep inet | awk -F'inet |/' '{printf $2}'`
+		fi
+		unset ___dummydev
+		#############################
+		
 		$IPS -! create mwan3_connected list:set
 
 		if ! $IPT4 -S mwan3_ifaces_in &> /dev/null; then
@@ -254,7 +262,14 @@ mwan3_create_iface_route()
 		else
 			network_get_gateway route_args $1
 		fi
-
+		
+		#### Dirty OpenVPN Tweak ####
+		if [ -z "$route_args" ]; then
+			route_args=`ip addr show $2 | grep inet | awk -F'inet |/' '{printf $2}'`
+			route_args="${route_args%.*}.1"
+		fi
+		#############################
+		
 		route_args="via $route_args dev $2"
 
 		$IP4 route flush table $id
