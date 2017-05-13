@@ -42,12 +42,12 @@ if [ "$ACTION" == "ifup" ]; then
 	fi
 
 	#### Dirty OpenVPN Tweak ####
-	network_get_physdev ___dummydev "$INTERFACE"
 	if [ -z "$route_args" ]; then
+		network_get_physdev ___dummydev "$INTERFACE"
 		gateway=`ip addr show $___dummydev | grep inet | awk -F'inet |/' '{printf $2}'`
 		gateway="${gateway%.*}.1"
+		unset ___dummydev
 	fi
-	unset ___dummydev
 	#############################
 	
 	[ -n "$gateway" ] || exit 9
